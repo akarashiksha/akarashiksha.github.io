@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permata Lombok Transport</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom Tailwind Config for specific animations -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'pulse-ring': 'pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite',
+                        'kenburns': 'kenburns 20s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        'pulse-ring': {
+                            '0%': { transform: 'scale(0.8)', opacity: '0.5' },
+                            '100%': { transform: 'scale(1.3)', opacity: '0' },
+                        },
+                        'kenburns': {
+                            '0%': { transform: 'scale(1)' },
+                            '100%': { transform: 'scale(1.1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        /* Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Preloader Ring */
+        .loader-ring::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 overflow-x-hidden selection:bg-blue-200 selection:text-blue-900 overflow-hidden" id="body">
+
+    <!-- PRELOADER -->
+    <div id="preloader" class="fixed inset-0 z-50 bg-[#0f172a] flex items-center justify-center overflow-hidden transition-opacity duration-500">
+        <div class="relative w-24 h-24 flex items-center justify-center loader-ring bg-blue-600/20 rounded-full backdrop-blur-sm">
+            <i data-lucide="car" class="w-10 h-10 text-blue-500 animate-pulse"></i>
+        </div>
+    </div>
+
+    <!-- HEADER - Floating Glassmorphism Navigation -->
+    <header id="main-header" class="fixed w-full z-40 transition-all duration-500 top-0 px-0">
+        <div id="header-inner" class="mx-auto max-w-7xl transition-all duration-500 bg-transparent px-6 py-6">
+            <div class="flex justify-between items-center">
+                <!-- Logo Kiri -->
+                <div class="cursor-pointer flex items-center gap-2 group scroll-link" data-target="beranda">
+                    <img 
+                        id="logo-img"
+                        src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539827/logo_ecwum7.png" 
+                        alt="Permata Lombok Transport Logo" 
+                        class="transition-all duration-300 object-contain h-12 drop-shadow-lg filter brightness-0 invert"
+                        onerror="this.onerror=null; this.src='https://via.placeholder.com/150x50?text=PERMATA+LOMBOK';"
+                    />
+                </div>
+
+                <!-- Desktop Menu Kanan -->
+                <nav class="hidden md:flex items-center gap-8 font-medium">
+                    <button class="scroll-link nav-link text-white text-sm tracking-wide hover:text-blue-500 transition-colors relative group" data-target="beranda">
+                        Beranda
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
+                    </button>
+                    <button class="scroll-link nav-link text-white text-sm tracking-wide hover:text-blue-500 transition-colors relative group" data-target="tentang">
+                        Tentang
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
+                    </button>
+                    <button class="scroll-link nav-link text-white text-sm tracking-wide hover:text-blue-500 transition-colors relative group" data-target="layanan">
+                        Layanan
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
+                    </button>
+                    <button class="scroll-link bg-blue-600 text-white px-6 py-2.5 rounded-full hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/30 transition-all active:scale-95 text-sm tracking-wide font-semibold" data-target="kontak">
+                        Hubungi Kami
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-btn" class="md:hidden focus:outline-none text-white">
+                    <i data-lucide="menu" id="icon-menu" class="w-7 h-7"></i>
+                    <i data-lucide="x" id="icon-x" class="w-7 h-7 hidden"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown -->
+        <div id="mobile-dropdown" class="md:hidden absolute top-full left-4 right-4 mt-2 bg-white/95 backdrop-blur-xl shadow-2xl rounded-2xl border border-slate-100 overflow-hidden transition-all duration-300 origin-top scale-y-0 opacity-0 pointer-events-none">
+            <div class="flex flex-col p-4 space-y-2">
+                <button class="scroll-link text-left px-4 py-3 text-slate-700 font-medium hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors" data-target="beranda">Beranda</button>
+                <button class="scroll-link text-left px-4 py-3 text-slate-700 font-medium hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors" data-target="tentang">Tentang</button>
+                <button class="scroll-link text-left px-4 py-3 text-slate-700 font-medium hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors" data-target="layanan">Layanan</button>
+                <button class="scroll-link text-left px-4 py-3 text-slate-700 font-medium hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors" data-target="kontak">Kontak</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section id="beranda" class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+        <!-- Background Image with Zoom Effect -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-cover bg-center animate-kenburns" style="background-image: url('https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539832/hero_uup9wl.jpg');"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/40 to-slate-900/90 mix-blend-multiply"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 md:px-12 relative z-20 text-white flex flex-col items-center text-center mt-20">
+            <div class="reveal">
+                <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-full text-xs font-semibold mb-8 tracking-widest uppercase shadow-2xl">
+                    <i data-lucide="star" class="w-3.5 h-3.5 text-yellow-400 fill-yellow-400"></i> Premium Travel Experience
+                </span>
+            </div>
+            
+            <h1 class="reveal delay-100 text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-[1.1] tracking-tight">
+                Eksplorasi <br />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                    Tanpa Batas
+                </span>
+            </h1>
+            
+            <p class="reveal delay-200 text-lg md:text-2xl font-light text-slate-300 mb-12 max-w-2xl">
+                Jelajahi pesona tersembunyi Pulau Lombok dengan armada premium, rute fleksibel, dan kearifan cerita lokal.
+            </p>
+            
+            <div class="reveal delay-300 flex flex-col sm:flex-row gap-5 w-full sm:w-auto">
+                <button class="scroll-link bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full font-bold transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] active:scale-95 flex items-center justify-center gap-3 group" data-target="layanan">
+                    Lihat Layanan 
+                    <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+                <a href="https://wa.me/6289876543210" target="_blank" rel="noreferrer" class="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold transition-all active:scale-95 flex items-center justify-center gap-3">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i> Konsultasi Gratis
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 opacity-70 animate-bounce">
+            <span class="text-white text-xs uppercase tracking-widest">Scroll</span>
+            <div class="w-[1px] h-8 bg-white/50"></div>
+        </div>
+    </section>
+
+    <!-- SECTION: TENTANG KAMI -->
+    <section id="tentang" class="py-24 relative z-30 bg-white">
+        <div class="container mx-auto px-6 md:px-12 max-w-7xl">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <h2 class="text-blue-600 font-bold tracking-wider uppercase text-sm mb-3">Mengapa Memilih Kami</h2>
+                <h3 class="text-3xl md:text-4xl font-bold text-slate-900">Lebih Dari Sekadar Perjalanan</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="reveal delay-100 group p-8 rounded-3xl bg-slate-50 hover:bg-white border border-slate-100 hover:border-slate-200 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:-translate-y-2 group-hover:shadow-lg transition-all duration-300">
+                        <i data-lucide="message-circle" class="w-7 h-7" stroke-width="1.5"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 text-slate-900">Local Storyteller</h4>
+                    <p class="text-slate-500 text-sm leading-relaxed">Supir warga lokal berwawasan budaya Sasak, ahli hidden gems, dan fotografer dadakan Anda.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="reveal delay-200 group p-8 rounded-3xl bg-slate-50 hover:bg-white border border-slate-100 hover:border-slate-200 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500">
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:-translate-y-2 group-hover:shadow-lg transition-all duration-300">
+                        <i data-lucide="shield-check" class="w-7 h-7" stroke-width="1.5"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 text-slate-900">Garansi Prima</h4>
+                    <p class="text-slate-500 text-sm leading-relaxed">Armada selalu bersih, wangi, dan AC maksimal sebelum menjemput Anda. SOP ketat!</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="reveal delay-300 group p-8 rounded-3xl bg-slate-50 hover:bg-white border border-slate-100 hover:border-slate-200 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500">
+                    <div class="w-14 h-14 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:-translate-y-2 group-hover:shadow-lg transition-all duration-300">
+                        <i data-lucide="map" class="w-7 h-7" stroke-width="1.5"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 text-slate-900">Rute Fleksibel</h4>
+                    <p class="text-slate-500 text-sm leading-relaxed">Ubah tujuan secara spontan. Kebebasan penuh menjelajahi Lombok sesuai mood Anda.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="reveal delay-400 group p-8 rounded-3xl bg-slate-50 hover:bg-white border border-slate-100 hover:border-slate-200 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500">
+                    <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:-translate-y-2 group-hover:shadow-lg transition-all duration-300">
+                        <i data-lucide="headset" class="w-7 h-7" stroke-width="1.5"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 text-slate-900">Support 24/7</h4>
+                    <p class="text-slate-500 text-sm leading-relaxed">Tim kami selalu siaga memantau dan membantu jika ada perubahan jadwal atau darurat.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: LAYANAN KAMI -->
+    <section id="layanan" class="py-24 bg-slate-50">
+        <div class="container mx-auto px-6 md:px-12 max-w-7xl">
+            <div class="mb-16 md:flex md:justify-between md:items-end reveal">
+                <div class="max-w-2xl">
+                    <h2 class="text-blue-600 font-bold tracking-wider uppercase text-sm mb-3">Layanan Kami</h2>
+                    <h3 class="text-3xl md:text-5xl font-bold text-slate-900 leading-tight">Solusi Mobilitas & Wisata Anda</h3>
+                </div>
+                <p class="text-slate-500 mt-4 md:mt-0 max-w-sm text-sm">Pilih layanan yang paling sesuai dengan kebutuhan liburan atau kunjungan bisnis Anda di Lombok.</p>
+            </div>
+
+            <div class="space-y-12">
+                
+                <!-- 1. Airport Transfer -->
+                <div class="reveal group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-200/60 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500 flex flex-col lg:flex-row">
+                    <div class="lg:w-[45%] h-72 lg:h-auto relative overflow-hidden">
+                        <img 
+                            src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539825/bandara_r6nw3z.jpg" 
+                            alt="Airport Transfer" 
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                            onerror="this.src='https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-8">
+                            <div class="text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <span class="bg-blue-600 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase mb-3 inline-block">Antar Jemput</span>
+                                <h3 class="text-3xl font-bold">Airport Transfer</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-[55%] p-8 lg:p-12">
+                        <p class="text-slate-500 mb-8 text-sm leading-relaxed">Layanan penjemputan dan pengantaran dari Bandara Internasional Lombok (ZAM) menuju berbagai destinasi utama dengan nyaman dan tepat waktu.</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-colors group/item">
+                                <div class="flex items-center gap-3">
+                                   <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                                      <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                                   </div>
+                                   <span class="font-semibold text-slate-700">Kuta Mandalika & Sekitar</span>
+                                </div>
+                                <div class="font-bold text-slate-900 bg-white shadow-sm px-4 py-1.5 rounded-full text-sm group-hover/item:text-blue-600 transition-colors">Rp 150K</div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-colors group/item">
+                                <div class="flex items-center gap-3">
+                                   <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                                      <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                                   </div>
+                                   <span class="font-semibold text-slate-700">Kota Mataram</span>
+                                </div>
+                                <div class="font-bold text-slate-900 bg-white shadow-sm px-4 py-1.5 rounded-full text-sm group-hover/item:text-blue-600 transition-colors">Rp 200K</div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-colors group/item">
+                                <div class="flex items-center gap-3">
+                                   <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                                      <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                                   </div>
+                                   <span class="font-semibold text-slate-700">Area Senggigi</span>
+                                </div>
+                                <div class="font-bold text-slate-900 bg-white shadow-sm px-4 py-1.5 rounded-full text-sm group-hover/item:text-blue-600 transition-colors">Rp 250K</div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-colors group/item">
+                                <div class="flex items-center gap-3">
+                                   <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                                      <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                                   </div>
+                                   <span class="font-semibold text-slate-700">Pelabuhan Bangsal</span>
+                                </div>
+                                <div class="font-bold text-slate-900 bg-white shadow-sm px-4 py-1.5 rounded-full text-sm group-hover/item:text-blue-600 transition-colors">Rp 300K</div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-colors group/item">
+                                <div class="flex items-center gap-3">
+                                   <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                                      <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                                   </div>
+                                   <span class="font-semibold text-slate-700">Senaru (Rinjani)</span>
+                                </div>
+                                <div class="font-bold text-slate-900 bg-white shadow-sm px-4 py-1.5 rounded-full text-sm group-hover/item:text-blue-600 transition-colors">Rp 450K</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Driver Rentcar -->
+                <div class="reveal group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-200/60 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500 flex flex-col lg:flex-row-reverse">
+                    <div class="lg:w-[45%] h-72 lg:h-auto relative overflow-hidden bg-slate-100 flex items-center justify-center p-8">
+                        <img 
+                            src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539828/alpard_cbbmm9.png" 
+                            alt="Driver Rentcar" 
+                            class="w-full h-auto max-h-full object-contain group-hover:scale-110 drop-shadow-2xl transition-transform duration-700 ease-out"
+                            onerror="this.src='https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'; this.className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out';"
+                        />
+                        <div class="absolute top-6 right-6">
+                            <span class="bg-slate-900 text-white px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase shadow-lg backdrop-blur-md bg-opacity-80">Include BBM & Driver</span>
+                        </div>
+                    </div>
+                    <div class="lg:w-[55%] p-8 lg:p-12">
+                        <h3 class="text-3xl font-bold text-slate-900 mb-4">Sewa Mobil Premium</h3>
+                        <p class="text-slate-500 mb-8 text-sm leading-relaxed">Nikmati perjalanan eksklusif dengan pilihan armada terbaik kami. Harga tertera adalah tarif per hari (12 Jam).</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Car 1 -->
+                            <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-blue-500 hover:shadow-md transition-all relative overflow-hidden group/card cursor-pointer">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-2 bg-slate-50 rounded-lg group-hover/card:bg-blue-50 transition-colors text-slate-400 group-hover/card:text-blue-500">
+                                        <i data-lucide="car" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-1 rounded-md">4 Kursi</span>
+                                </div>
+                                <h5 class="font-bold text-lg text-slate-800 mb-1">Toyota Avanza</h5>
+                                <div class="flex items-end gap-1">
+                                    <span class="text-2xl font-black text-blue-600">Rp 500K</span>
+                                    <span class="text-xs text-slate-400 mb-1">/hari</span>
+                                </div>
+                            </div>
+                            <!-- Car 2 -->
+                            <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-blue-500 hover:shadow-md transition-all relative overflow-hidden group/card cursor-pointer">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-2 bg-slate-50 rounded-lg group-hover/card:bg-blue-50 transition-colors text-slate-400 group-hover/card:text-blue-500">
+                                        <i data-lucide="car" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-1 rounded-md">6 Kursi</span>
+                                </div>
+                                <h5 class="font-bold text-lg text-slate-800 mb-1">Innova Reborn</h5>
+                                <div class="flex items-end gap-1">
+                                    <span class="text-2xl font-black text-blue-600">Rp 800K</span>
+                                    <span class="text-xs text-slate-400 mb-1">/hari</span>
+                                </div>
+                            </div>
+                            <!-- Car 3 -->
+                            <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-blue-500 hover:shadow-md transition-all relative overflow-hidden group/card cursor-pointer">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-2 bg-slate-50 rounded-lg group-hover/card:bg-blue-50 transition-colors text-slate-400 group-hover/card:text-blue-500">
+                                        <i data-lucide="car" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-1 rounded-md">14 Kursi</span>
+                                </div>
+                                <h5 class="font-bold text-lg text-slate-800 mb-1">Hiace Commuter</h5>
+                                <div class="flex items-end gap-1">
+                                    <span class="text-2xl font-black text-blue-600">Rp 1.2M</span>
+                                    <span class="text-xs text-slate-400 mb-1">/hari</span>
+                                </div>
+                            </div>
+                            <!-- Car 4 -->
+                            <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-blue-500 hover:shadow-md transition-all relative overflow-hidden group/card cursor-pointer">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-2 bg-slate-50 rounded-lg group-hover/card:bg-blue-50 transition-colors text-slate-400 group-hover/card:text-blue-500">
+                                        <i data-lucide="car" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-1 rounded-md">VIP</span>
+                                </div>
+                                <h5 class="font-bold text-lg text-slate-800 mb-1">Toyota Alphard</h5>
+                                <div class="flex items-end gap-1">
+                                    <span class="text-2xl font-black text-blue-600">Rp 2.5M</span>
+                                    <span class="text-xs text-slate-400 mb-1">/hari</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Paket Wisata -->
+                <div class="reveal group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-200/60 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500 flex flex-col lg:flex-row">
+                    <div class="lg:w-[45%] h-72 lg:h-auto relative overflow-hidden">
+                        <img 
+                            src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539827/gili_wdawwj.jpg" 
+                            alt="Paket Wisata Lombok" 
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                            onerror="this.src='https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent flex items-end p-8">
+                            <div class="text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <h3 class="text-3xl font-bold">Paket Wisata Harian</h3>
+                                <p class="text-slate-300 text-sm mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">Jelajahi keindahan alam dan budaya Sasak.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-[55%] p-8 lg:p-12">
+                        <div class="space-y-4">
+                            <!-- Tour 1 -->
+                            <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] hover:border-blue-100 transition-all cursor-pointer group/tour">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
+                                    <h5 class="font-bold text-lg text-slate-800 group-hover/tour:text-blue-600 transition-colors flex items-center gap-2">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
+                                        Sasak Mandalika Tour
+                                    </h5>
+                                    <div class="inline-flex items-center justify-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold text-sm">Rp 600K</div>
+                                </div>
+                                <p class="text-slate-500 text-sm leading-relaxed pl-7">Desa Sade – Pantai Kuta – Sirkuit Mandalika – Bukit Merese – Tanjung Aan</p>
+                            </div>
+                            <!-- Tour 2 -->
+                            <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] hover:border-blue-100 transition-all cursor-pointer group/tour">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
+                                    <h5 class="font-bold text-lg text-slate-800 group-hover/tour:text-blue-600 transition-colors flex items-center gap-2">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
+                                        Air Terjun Eksotis
+                                    </h5>
+                                    <div class="inline-flex items-center justify-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold text-sm">Rp 700K</div>
+                                </div>
+                                <p class="text-slate-500 text-sm leading-relaxed pl-7">Sendang Gile – Masjid Kuno Bayan – Sunset Pantai Senggigi</p>
+                            </div>
+                            <!-- Tour 3 -->
+                            <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] hover:border-blue-100 transition-all cursor-pointer group/tour">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
+                                    <h5 class="font-bold text-lg text-slate-800 group-hover/tour:text-blue-600 transition-colors flex items-center gap-2">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
+                                        Pantai Pasir Putih
+                                    </h5>
+                                    <div class="inline-flex items-center justify-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold text-sm">Rp 800K</div>
+                                </div>
+                                <p class="text-slate-500 text-sm leading-relaxed pl-7">Tanjung Luar - Pink Beach - Pulau Pasir - Gili Petelu</p>
+                            </div>
+                            <!-- Tour 4 -->
+                            <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] hover:border-blue-100 transition-all cursor-pointer group/tour">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
+                                    <h5 class="font-bold text-lg text-slate-800 group-hover/tour:text-blue-600 transition-colors flex items-center gap-2">
+                                        <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
+                                        Pesona Gili Trawangan
+                                    </h5>
+                                    <div class="inline-flex items-center justify-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold text-sm">Rp 900K</div>
+                                </div>
+                                <p class="text-slate-500 text-sm leading-relaxed pl-7">Bukit Malimbu – Pelabuhan Bangsal – Hutan Kera Pusuk</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER & KONTAK -->
+    <footer id="kontak" class="bg-[#0b1325] text-white pt-20 pb-8 relative overflow-hidden">
+        <!-- Dekoratif Background -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+        
+        <div class="container mx-auto px-6 md:px-12 max-w-7xl relative z-10">
+            <div class="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-[2rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between mb-20 shadow-2xl reveal">
+                <div class="mb-6 md:mb-0">
+                    <h3 class="text-3xl font-bold text-white mb-2">Siap Mulai Perjalanan Anda?</h3>
+                    <p class="text-blue-100 text-lg">Konsultasikan kebutuhan transport & wisata Anda sekarang.</p>
+                </div>
+                <a href="https://wa.me/6289876543210" target="_blank" rel="noreferrer" class="bg-white text-blue-600 hover:bg-slate-50 px-8 py-4 rounded-full font-bold transition-all shadow-lg active:scale-95 flex items-center gap-3 whitespace-nowrap">
+                    <i data-lucide="message-circle" class="w-6 h-6"></i> Chat WhatsApp Kami
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
+                <!-- Brand Info -->
+                <div class="lg:col-span-5 space-y-6">
+                    <img 
+                        src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539827/logo_ecwum7.png" 
+                        alt="Permata Lombok Transport Logo" 
+                        class="h-14 w-auto object-contain filter brightness-0 invert opacity-90"
+                        onerror="this.style.display='none';"
+                    />
+                    <p class="text-slate-400 text-sm leading-relaxed max-w-sm">
+                        Menghadirkan pengalaman mobilitas premium di Pulau Lombok. Armada terawat, supir berdedikasi, dan rute perjalanan fleksibel untuk kenyamanan maksimal Anda.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="lg:col-span-3">
+                    <h4 class="text-lg font-bold mb-6 text-white tracking-wide">Navigasi</h4>
+                    <ul class="space-y-3 text-slate-400">
+                        <li>
+                            <button class="scroll-link hover:text-white transition-colors flex items-center gap-2 group" data-target="beranda">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span> Beranda
+                            </button>
+                        </li>
+                        <li>
+                            <button class="scroll-link hover:text-white transition-colors flex items-center gap-2 group" data-target="tentang">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span> Tentang
+                            </button>
+                        </li>
+                        <li>
+                            <button class="scroll-link hover:text-white transition-colors flex items-center gap-2 group" data-target="layanan">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span> Layanan
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Kontak Info -->
+                <div class="lg:col-span-4">
+                    <h4 class="text-lg font-bold mb-6 text-white tracking-wide">Hubungi Kami</h4>
+                    <ul class="space-y-4 text-slate-400">
+                        <li>
+                            <a href="https://wa.me/6289876543210" target="_blank" rel="noreferrer" class="flex items-start gap-3 hover:text-white transition group">
+                                <i data-lucide="phone" class="w-5 h-5 text-blue-500 mt-0.5"></i>
+                                <span>+62 89 876-543-210 <br/><span class="text-xs text-slate-500">Fast Response WhatsApp</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-3 hover:text-white transition group">
+                                <i data-lucide="instagram" class="w-5 h-5 text-pink-500"></i>
+                                <span>@permatalomboktransport</span>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="flex items-start gap-3 mt-4 pt-4 border-t border-slate-800">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-red-500 mt-1 flex-shrink-0"></i>
+                                <p class="text-sm leading-relaxed text-slate-400">
+                                    Jl. Swasembada No.133, Karang Pule, Kec. Mataram, Kota Mataram, Nusa Tenggara Barat, 83115.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+                <p>© 2026 Permata Lombok Transport. All Rights Reserved.</p>
+                <div class="mt-4 md:mt-0 flex space-x-6">
+                    <span class="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
+                    <span class="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Initialize Lucide Icons
+            lucide.createIcons();
+
+            // 2. Preloader Logic
+            setTimeout(() => {
+                const preloader = document.getElementById('preloader');
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                    document.getElementById('body').classList.remove('overflow-hidden');
+                    
+                    // Trigger scroll observer immediately after preloader
+                    handleScrollReveal();
+                }, 500);
+            }, 2000);
+
+            // 3. Header Scroll Effect
+            const header = document.getElementById('main-header');
+            const headerInner = document.getElementById('header-inner');
+            const logoImg = document.getElementById('logo-img');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY > 50;
+
+                if (scrolled) {
+                    header.classList.remove('top-0', 'px-0');
+                    header.classList.add('top-4', 'px-4', 'md:px-8');
+
+                    headerInner.classList.remove('bg-transparent', 'px-6', 'py-6');
+                    headerInner.classList.add('bg-white/80', 'backdrop-blur-md', 'shadow-lg', 'shadow-blue-900/5', 'rounded-full', 'px-6', 'py-3', 'border', 'border-white/50');
+
+                    logoImg.classList.remove('h-12', 'drop-shadow-lg', 'filter', 'brightness-0', 'invert');
+                    logoImg.classList.add('h-8');
+
+                    mobileMenuBtn.classList.remove('text-white');
+                    mobileMenuBtn.classList.add('text-slate-800');
+
+                    navLinks.forEach(link => {
+                        link.classList.remove('text-white');
+                        link.classList.add('text-slate-600');
+                    });
+                } else {
+                    header.classList.remove('top-4', 'px-4', 'md:px-8');
+                    header.classList.add('top-0', 'px-0');
+
+                    headerInner.classList.remove('bg-white/80', 'backdrop-blur-md', 'shadow-lg', 'shadow-blue-900/5', 'rounded-full', 'px-6', 'py-3', 'border', 'border-white/50');
+                    headerInner.classList.add('bg-transparent', 'px-6', 'py-6');
+
+                    logoImg.classList.remove('h-8');
+                    logoImg.classList.add('h-12', 'drop-shadow-lg', 'filter', 'brightness-0', 'invert');
+
+                    mobileMenuBtn.classList.remove('text-slate-800');
+                    mobileMenuBtn.classList.add('text-white');
+
+                    navLinks.forEach(link => {
+                        link.classList.remove('text-slate-600');
+                        link.classList.add('text-white');
+                    });
+                }
+            });
+
+            // 4. Mobile Menu Toggle
+            const dropdown = document.getElementById('mobile-dropdown');
+            const iconMenu = document.getElementById('icon-menu');
+            const iconX = document.getElementById('icon-x');
+            let isMobileMenuOpen = false;
+
+            function toggleMobileMenu() {
+                isMobileMenuOpen = !isMobileMenuOpen;
+                if (isMobileMenuOpen) {
+                    dropdown.classList.remove('scale-y-0', 'opacity-0', 'pointer-events-none');
+                    dropdown.classList.add('scale-y-100', 'opacity-100');
+                    iconMenu.classList.add('hidden');
+                    iconX.classList.remove('hidden');
+                } else {
+                    dropdown.classList.remove('scale-y-100', 'opacity-100');
+                    dropdown.classList.add('scale-y-0', 'opacity-0', 'pointer-events-none');
+                    iconMenu.classList.remove('hidden');
+                    iconX.classList.add('hidden');
+                }
+            }
+
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+            // 5. Smooth Scroll
+            const scrollLinks = document.querySelectorAll('.scroll-link');
+            scrollLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (isMobileMenuOpen) toggleMobileMenu(); // Close mobile menu if open
+
+                    const targetId = link.getAttribute('data-target');
+                    const element = document.getElementById(targetId);
+                    
+                    if (element) {
+                        const offset = 100; // Penyesuaian offset navbar mengambang
+                        const bodyRect = document.body.getBoundingClientRect().top;
+                        const elementRect = element.getBoundingClientRect().top;
+                        const elementPosition = elementRect - bodyRect;
+                        const offsetPosition = elementPosition - offset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // 6. Intersection Observer for Scroll Reveal Animations
+            const handleScrollReveal = () => {
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-visible');
+                            }
+                        });
+                    },
+                    { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+                );
+
+                const hiddenElements = document.querySelectorAll('.reveal');
+                hiddenElements.forEach((el) => observer.observe(el));
+            };
+        });
+    </script>
+</body>
+</html>
