@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permata Lombok Transport</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Konfigurasi Animasi Custom Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+                        'drive': 'drive 2.5s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(40px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        drive: {
+                            '0%': { transform: 'translateX(-150%)' },
+                            '50%': { transform: 'translateX(50vw)' },
+                            '100%': { transform: 'translateX(150vw)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .opacity-0-init { opacity: 0; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        
+        /* Smooth transition untuk preloader */
+        #preloader { transition: opacity 0.5s ease; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
+
+    <!-- ==============================================
+         PRELOADER
+         ============================================== -->
+    <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-blue-50">
+        <div class="relative w-full overflow-hidden flex flex-col items-center">
+            <div class="text-blue-600 mb-4 font-bold text-xl tracking-wider">Mempersiapkan Perjalanan...</div>
+            <div class="w-full relative h-16 border-b-4 border-gray-800 flex items-end pb-1">
+                <div class="absolute animate-drive flex items-center">
+                    <i data-lucide="car" class="text-blue-600" style="width: 48px; height: 48px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         APP WRAPPER (Hidden initially)
+         ============================================== -->
+    <div id="app-wrapper" class="flex-grow flex flex-col hidden">
+        
+        <!-- HEADER / NAVBAR -->
+        <header class="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    
+                    <!-- Logo -->
+                    <div class="flex items-center cursor-pointer" onclick="setActivePage('beranda')">
+                        <img 
+                            src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539827/logo_ecwum7.png" 
+                            alt="Permata Lombok Transport Logo" 
+                            class="h-12 w-auto object-contain"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                        />
+                        <span class="hidden ml-2 text-xl font-bold text-blue-700">Permata Lombok</span>
+                    </div>
+
+                    <!-- Desktop Navigation -->
+                    <nav class="hidden md:flex space-x-8">
+                        <button onclick="setActivePage('beranda')" data-page="beranda" class="desktop-nav-link capitalize font-medium transition-colors text-blue-600 border-b-2 border-blue-600 pb-1">beranda</button>
+                        <button onclick="setActivePage('tentang')" data-page="tentang" class="desktop-nav-link capitalize font-medium transition-colors text-gray-600 hover:text-blue-500">tentang</button>
+                        <button onclick="setActivePage('layanan')" data-page="layanan" class="desktop-nav-link capitalize font-medium transition-colors text-gray-600 hover:text-blue-500">layanan</button>
+                        <button onclick="setActivePage('kontak')" data-page="kontak" class="desktop-nav-link capitalize font-medium transition-colors text-gray-600 hover:text-blue-500">kontak</button>
+                    </nav>
+
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden flex items-center">
+                        <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="text-gray-600 hover:text-blue-600 focus:outline-none p-2">
+                            <i data-lucide="menu" style="width: 28px; height: 28px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Panel -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg">
+                <div class="px-4 pt-2 pb-6 space-y-2">
+                    <button onclick="setActivePage('beranda')" data-page="beranda" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-lg capitalize font-medium bg-blue-50 text-blue-600">beranda</button>
+                    <button onclick="setActivePage('tentang')" data-page="tentang" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-lg capitalize font-medium text-gray-600 hover:bg-gray-50">tentang</button>
+                    <button onclick="setActivePage('layanan')" data-page="layanan" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-lg capitalize font-medium text-gray-600 hover:bg-gray-50">layanan</button>
+                    <button onclick="setActivePage('kontak')" data-page="kontak" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-lg capitalize font-medium text-gray-600 hover:bg-gray-50">kontak</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-grow">
+            
+            <!-- HALAMAN BERANDA -->
+            <div id="page-beranda" class="page-content relative">
+                <!-- HERO SECTION -->
+                <div class="relative h-[80vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+                    <div class="absolute inset-0 z-0 scale-105 animate-[pulse_20s_ease-in-out_infinite_alternate]">
+                        <img 
+                            src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539832/hero_uup9wl.jpg" 
+                            alt="Pesona Lombok" 
+                            class="w-full h-full object-cover"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&q=80';"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/60 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-50/90"></div>
+                    </div>
+
+                    <div class="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center mt-[-5vh]">
+                        <div class="text-center w-full">
+                            <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 drop-shadow-xl tracking-tight animate-fade-in-up opacity-0-init">
+                                PERMATA LOMBOK
+                            </h1>
+                            <h2 class="text-lg sm:text-xl md:text-2xl text-blue-50/90 font-medium drop-shadow-md animate-fade-in-up opacity-0-init delay-100 max-w-2xl mx-auto">
+                                Jelajahi Pesona Lombok dengan Nyaman, Fleksibel, dan Terpercaya
+                            </h2>
+                            
+                            <button onclick="setActivePage('layanan')" class="mt-10 px-8 py-4 sm:px-10 sm:py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold text-lg shadow-xl shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center mx-auto space-x-3 animate-fade-in-up opacity-0-init delay-200 group">
+                                <span>Lihat Layanan Kami</span>
+                                <i data-lucide="chevron-right" class="group-hover:translate-x-1 transition-transform" style="width: 24px; height: 24px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Info Section -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mt-[-10vh] relative z-20">
+                    <div class="flex flex-col md:flex-row items-center justify-between bg-white/80 backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-xl border border-white/50 animate-fade-in-up opacity-0-init delay-300 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+                        <div class="mb-6 md:mb-0 md:mr-8 text-center md:text-left">
+                            <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">Mengapa Memilih Kami?</h3>
+                            <p class="text-gray-600 text-lg">Pengalaman lokal otentik dengan armada prima yang menjamin kenyamanan liburan Anda di Lombok.</p>
+                        </div>
+                        <button onclick="setActivePage('tentang')" class="flex items-center justify-center bg-gray-50 hover:bg-blue-50 text-blue-600 px-6 py-3 rounded-2xl font-semibold transition-colors whitespace-nowrap group w-full md:w-auto">
+                            Pelajari Selengkapnya <i data-lucide="chevron-right" class="ml-2 group-hover:translate-x-1 transition-transform" style="width: 20px; height: 20px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN TENTANG KAMI -->
+            <div id="page-tentang" class="page-content hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+                    <div class="text-center mb-20 animate-fade-in-up opacity-0-init">
+                        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">Tentang Kami</h2>
+                        <div class="w-24 h-1.5 bg-blue-600 mx-auto rounded-full mb-8"></div>
+                        <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-600 leading-relaxed">
+                            Lebih dari sekadar transportasi. Kami adalah mitra lokal yang siap menjadikan perjalanan Anda di Lombok penuh makna, nyaman, dan tak terlupakan.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+                        <div class="group bg-white p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-2xl border border-gray-100 hover:border-blue-100 hover:-translate-y-2 transition-all duration-500 flex flex-col sm:flex-row items-start gap-6 animate-fade-in-up opacity-0-init">
+                            <div class="bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white p-5 rounded-2xl flex-shrink-0 transition-colors duration-500">
+                                <i data-lucide="user-check" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors">Pengemudi Sebagai Local Storyteller</h3>
+                                <p class="text-gray-600 leading-relaxed text-base">Supir ramah, warga lokal berwawasan budaya Sasak, pemberi rekomendasi hidden gems kuliner, dan siap bantu foto untuk momen liburan Anda.</p>
+                            </div>
+                        </div>
+
+                        <div class="group bg-white p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-2xl border border-gray-100 hover:border-blue-100 hover:-translate-y-2 transition-all duration-500 flex flex-col sm:flex-row items-start gap-6 animate-fade-in-up opacity-0-init delay-100">
+                            <div class="bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white p-5 rounded-2xl flex-shrink-0 transition-colors duration-500">
+                                <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors">Garansi Kendaraan Prima dan Wangi</h3>
+                                <p class="text-gray-600 leading-relaxed text-base">SOP kebersihan ketat, mobil dijamin bersih, nyaman, dan AC berfungsi maksimal sebelum menjemput Anda.</p>
+                            </div>
+                        </div>
+
+                        <div class="group bg-white p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-2xl border border-gray-100 hover:border-blue-100 hover:-translate-y-2 transition-all duration-500 flex flex-col sm:flex-row items-start gap-6 animate-fade-in-up opacity-0-init delay-200">
+                            <div class="bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white p-5 rounded-2xl flex-shrink-0 transition-colors duration-500">
+                                <i data-lucide="map" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors">Fleksibilitas Rute</h3>
+                                <p class="text-gray-600 leading-relaxed text-base">Kebebasan menyesuaikan atau mengubah rute secara spontan. Liburan Anda, aturan Anda.</p>
+                            </div>
+                        </div>
+
+                        <div class="group bg-white p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-2xl border border-gray-100 hover:border-blue-100 hover:-translate-y-2 transition-all duration-500 flex flex-col sm:flex-row items-start gap-6 animate-fade-in-up opacity-0-init delay-300">
+                            <div class="bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white p-5 rounded-2xl flex-shrink-0 transition-colors duration-500">
+                                <i data-lucide="headphones" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors">Layanan Konsultasi 24/7</h3>
+                                <p class="text-gray-600 leading-relaxed text-base">Customer Service siaga memantau dan memberi solusi cepat untuk perubahan jadwal atau keadaan darurat.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN LAYANAN KAMI -->
+            <div id="page-layanan" class="page-content hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+                    <div class="text-center mb-20 animate-fade-in-up opacity-0-init">
+                        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">Layanan Kami</h2>
+                        <div class="w-24 h-1.5 bg-blue-600 mx-auto rounded-full mb-8"></div>
+                        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Solusi transportasi dan wisata terbaik yang disesuaikan dengan kebutuhan Anda.</p>
+                    </div>
+
+                    <div class="space-y-12 md:space-y-20">
+                        
+                        <!-- Airport Transfer -->
+                        <div class="group bg-white rounded-3xl shadow-sm hover:shadow-2xl border border-gray-100 overflow-hidden transition-all duration-500 animate-fade-in-up opacity-0-init">
+                            <div class="grid grid-cols-1 lg:grid-cols-5">
+                                <div class="lg:col-span-2 relative h-72 lg:h-auto overflow-hidden">
+                                    <img 
+                                        src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539825/bandara_r6nw3z.jpg" 
+                                        alt="Airport Transfer" 
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                                        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80';"
+                                    />
+                                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent flex items-end p-8">
+                                        <h3 class="text-3xl font-bold text-white tracking-wide">Airport Transfer</h3>
+                                    </div>
+                                </div>
+                                <div class="lg:col-span-3 p-6 md:p-10">
+                                    <div class="space-y-2">
+                                        <!-- Item 1 -->
+                                        <div class="flex justify-between items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 flex-shrink-0"><i data-lucide="map-pin" style="width: 20px; height: 20px;"></i></div>
+                                                <span class="font-medium text-gray-700 text-sm sm:text-base">Bandara <span class="mx-1 sm:mx-2 text-gray-400">→</span> Kuta Mandalika & Sekitar</span>
+                                            </div>
+                                            <span class="font-bold text-blue-600 whitespace-nowrap ml-2 text-sm sm:text-base bg-blue-50 px-3 py-1.5 rounded-lg">Rp 150.000</span>
+                                        </div>
+                                        <!-- Item 2 -->
+                                        <div class="flex justify-between items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 flex-shrink-0"><i data-lucide="map-pin" style="width: 20px; height: 20px;"></i></div>
+                                                <span class="font-medium text-gray-700 text-sm sm:text-base">Bandara <span class="mx-1 sm:mx-2 text-gray-400">→</span> Kota Mataram</span>
+                                            </div>
+                                            <span class="font-bold text-blue-600 whitespace-nowrap ml-2 text-sm sm:text-base bg-blue-50 px-3 py-1.5 rounded-lg">Rp 200.000</span>
+                                        </div>
+                                        <!-- Item 3 -->
+                                        <div class="flex justify-between items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 flex-shrink-0"><i data-lucide="map-pin" style="width: 20px; height: 20px;"></i></div>
+                                                <span class="font-medium text-gray-700 text-sm sm:text-base">Bandara <span class="mx-1 sm:mx-2 text-gray-400">→</span> Senggigi</span>
+                                            </div>
+                                            <span class="font-bold text-blue-600 whitespace-nowrap ml-2 text-sm sm:text-base bg-blue-50 px-3 py-1.5 rounded-lg">Rp 250.000</span>
+                                        </div>
+                                        <!-- Item 4 -->
+                                        <div class="flex justify-between items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 flex-shrink-0"><i data-lucide="map-pin" style="width: 20px; height: 20px;"></i></div>
+                                                <span class="font-medium text-gray-700 text-sm sm:text-base">Bandara <span class="mx-1 sm:mx-2 text-gray-400">→</span> Pelabuhan Bangsal</span>
+                                            </div>
+                                            <span class="font-bold text-blue-600 whitespace-nowrap ml-2 text-sm sm:text-base bg-blue-50 px-3 py-1.5 rounded-lg">Rp 300.000</span>
+                                        </div>
+                                        <!-- Item 5 -->
+                                        <div class="flex justify-between items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 flex-shrink-0"><i data-lucide="map-pin" style="width: 20px; height: 20px;"></i></div>
+                                                <span class="font-medium text-gray-700 text-sm sm:text-base">Bandara <span class="mx-1 sm:mx-2 text-gray-400">→</span> Senaru</span>
+                                            </div>
+                                            <span class="font-bold text-blue-600 whitespace-nowrap ml-2 text-sm sm:text-base bg-blue-50 px-3 py-1.5 rounded-lg">Rp 450.000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Driver Rentcar -->
+                        <div class="group bg-white rounded-3xl shadow-sm hover:shadow-2xl border border-gray-100 overflow-hidden transition-all duration-500 animate-fade-in-up opacity-0-init delay-100">
+                            <div class="grid grid-cols-1 lg:grid-cols-5">
+                                <div class="lg:col-span-2 relative h-72 lg:h-auto lg:order-last overflow-hidden">
+                                    <img 
+                                        src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539828/alpard_cbbmm9.png" 
+                                        alt="Driver Rentcar" 
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                                        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80';"
+                                    />
+                                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent flex items-end p-8">
+                                        <h3 class="text-3xl font-bold text-white tracking-wide">Sewa Mobil + Supir</h3>
+                                    </div>
+                                </div>
+                                <div class="lg:col-span-3 p-6 md:p-10 lg:border-r border-gray-100">
+                                    <div class="space-y-2">
+                                        <!-- Item 1 -->
+                                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-start sm:items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 mt-1 sm:mt-0 flex-shrink-0">
+                                                    <i data-lucide="car" style="width: 20px; height: 20px;"></i>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-gray-800">Toyota Avanza</h4>
+                                                    <p class="text-sm text-gray-500 mt-0.5 flex items-center">
+                                                        <i data-lucide="user-check" class="mr-1.5" style="width: 14px; height: 14px;"></i> Kapasitas: 4 Orang
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 sm:mt-0 sm:text-right ml-14 sm:ml-0">
+                                                <span class="font-bold text-blue-600 text-base sm:text-lg bg-blue-50 px-3 py-1.5 rounded-lg inline-block">Rp 500.000 <span class="text-sm font-normal text-gray-500 bg-transparent">/ Hari</span></span>
+                                            </div>
+                                        </div>
+                                        <!-- Item 2 -->
+                                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-start sm:items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 mt-1 sm:mt-0 flex-shrink-0">
+                                                    <i data-lucide="car" style="width: 20px; height: 20px;"></i>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-gray-800">Toyota Innova Reborn</h4>
+                                                    <p class="text-sm text-gray-500 mt-0.5 flex items-center">
+                                                        <i data-lucide="user-check" class="mr-1.5" style="width: 14px; height: 14px;"></i> Kapasitas: 6 Orang
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 sm:mt-0 sm:text-right ml-14 sm:ml-0">
+                                                <span class="font-bold text-blue-600 text-base sm:text-lg bg-blue-50 px-3 py-1.5 rounded-lg inline-block">Rp 800.000 <span class="text-sm font-normal text-gray-500 bg-transparent">/ Hari</span></span>
+                                            </div>
+                                        </div>
+                                        <!-- Item 3 -->
+                                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-start sm:items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 mt-1 sm:mt-0 flex-shrink-0">
+                                                    <i data-lucide="car" style="width: 20px; height: 20px;"></i>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-gray-800">Toyota Hiace Commuter</h4>
+                                                    <p class="text-sm text-gray-500 mt-0.5 flex items-center">
+                                                        <i data-lucide="user-check" class="mr-1.5" style="width: 14px; height: 14px;"></i> Kapasitas: 14 Orang
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 sm:mt-0 sm:text-right ml-14 sm:ml-0">
+                                                <span class="font-bold text-blue-600 text-base sm:text-lg bg-blue-50 px-3 py-1.5 rounded-lg inline-block">Rp 1.200.000 <span class="text-sm font-normal text-gray-500 bg-transparent">/ Hari</span></span>
+                                            </div>
+                                        </div>
+                                        <!-- Item 4 -->
+                                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 hover:bg-gray-50 rounded-2xl transition-colors">
+                                            <div class="flex items-start sm:items-center">
+                                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-4 mt-1 sm:mt-0 flex-shrink-0">
+                                                    <i data-lucide="car" style="width: 20px; height: 20px;"></i>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-gray-800">Toyota Alphard VIP</h4>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 sm:mt-0 sm:text-right ml-14 sm:ml-0">
+                                                <span class="font-bold text-blue-600 text-base sm:text-lg bg-blue-50 px-3 py-1.5 rounded-lg inline-block">Rp 2.500.000 <span class="text-sm font-normal text-gray-500 bg-transparent">/ Hari</span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paket Wisata -->
+                        <div class="group bg-white rounded-3xl shadow-sm hover:shadow-2xl border border-gray-100 overflow-hidden transition-all duration-500 animate-fade-in-up opacity-0-init delay-200">
+                            <div class="grid grid-cols-1 lg:grid-cols-5">
+                                <div class="lg:col-span-2 relative h-72 lg:h-auto overflow-hidden">
+                                    <img 
+                                        src="https://res.cloudinary.com/ddtgjvetf/image/upload/v1774539827/gili_wdawwj.jpg" 
+                                        alt="Paket Wisata Lombok" 
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                                        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1573790387438-4da905039392?auto=format&fit=crop&q=80';"
+                                    />
+                                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent flex items-end p-8">
+                                        <h3 class="text-3xl font-bold text-white tracking-wide">Paket Wisata Harian</h3>
+                                    </div>
+                                </div>
+                                <div class="lg:col-span-3 p-6 md:p-10">
+                                    <div class="space-y-4">
+                                        <!-- Item 1 -->
+                                        <div class="p-5 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100">
+                                            <div class="flex flex-col sm:flex-row justify-between sm:items-start mb-3 gap-3">
+                                                <h4 class="font-bold text-lg text-gray-900">Sasak Mandalika Tour</h4>
+                                                <span class="font-bold text-blue-600 bg-blue-50 px-4 py-1.5 rounded-lg self-start whitespace-nowrap">Rp 600.000</span>
+                                            </div>
+                                            <p class="text-gray-600 text-sm leading-relaxed flex items-start">
+                                                <i data-lucide="route" class="text-blue-400 mr-2 mt-0.5 flex-shrink-0" style="width: 18px; height: 18px;"></i>
+                                                Desa Adat Sade – Pantai Kuta Mandalika – Sirkuit Mandalika – Bukit Merese – Pantai Tanjung Aan
+                                            </p>
+                                        </div>
+                                        <!-- Item 2 -->
+                                        <div class="p-5 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100">
+                                            <div class="flex flex-col sm:flex-row justify-between sm:items-start mb-3 gap-3">
+                                                <h4 class="font-bold text-lg text-gray-900">Air Terjun Eksotis</h4>
+                                                <span class="font-bold text-blue-600 bg-blue-50 px-4 py-1.5 rounded-lg self-start whitespace-nowrap">Rp 700.000</span>
+                                            </div>
+                                            <p class="text-gray-600 text-sm leading-relaxed flex items-start">
+                                                <i data-lucide="route" class="text-blue-400 mr-2 mt-0.5 flex-shrink-0" style="width: 18px; height: 18px;"></i>
+                                                Air Terjun Sendang Gile – Masjid Kuno Bayan – Sunset di Pantai Senggigi
+                                            </p>
+                                        </div>
+                                        <!-- Item 3 -->
+                                        <div class="p-5 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100">
+                                            <div class="flex flex-col sm:flex-row justify-between sm:items-start mb-3 gap-3">
+                                                <h4 class="font-bold text-lg text-gray-900">Pantai Pasir Putih</h4>
+                                                <span class="font-bold text-blue-600 bg-blue-50 px-4 py-1.5 rounded-lg self-start whitespace-nowrap">Rp 800.000</span>
+                                            </div>
+                                            <p class="text-gray-600 text-sm leading-relaxed flex items-start">
+                                                <i data-lucide="route" class="text-blue-400 mr-2 mt-0.5 flex-shrink-0" style="width: 18px; height: 18px;"></i>
+                                                Pelabuhan Tanjung Luar - Pink Beach - Pulau Pasir - Gili Petelu
+                                            </p>
+                                        </div>
+                                        <!-- Item 4 -->
+                                        <div class="p-5 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100">
+                                            <div class="flex flex-col sm:flex-row justify-between sm:items-start mb-3 gap-3">
+                                                <h4 class="font-bold text-lg text-gray-900">Pesona Gili Trawangan</h4>
+                                                <span class="font-bold text-blue-600 bg-blue-50 px-4 py-1.5 rounded-lg self-start whitespace-nowrap">Rp 900.000</span>
+                                            </div>
+                                            <p class="text-gray-600 text-sm leading-relaxed flex items-start">
+                                                <i data-lucide="route" class="text-blue-400 mr-2 mt-0.5 flex-shrink-0" style="width: 18px; height: 18px;"></i>
+                                                Bukit Malimbu – Pelabuhan Bangsal – Hutan Kera Pusuk
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN KONTAK -->
+            <div id="page-kontak" class="page-content hidden">
+                <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+                    <div class="text-center mb-16 animate-fade-in-up opacity-0-init">
+                        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">Hubungi Kami</h2>
+                        <div class="w-24 h-1.5 bg-blue-600 mx-auto rounded-full mb-8"></div>
+                        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Tim kami selalu sedia 24/7 untuk membantu merencanakan perjalanan impian Anda.</p>
+                    </div>
+
+                    <div class="bg-white rounded-[2rem] shadow-2xl shadow-blue-900/5 border border-gray-100 overflow-hidden animate-fade-in-up opacity-0-init delay-100">
+                        <div class="grid grid-cols-1 md:grid-cols-2">
+                            <!-- Info Section -->
+                            <div class="bg-gradient-to-br from-blue-600 to-blue-800 text-white p-10 md:p-14 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                                <div class="absolute bottom-0 left-0 -mb-16 -ml-16 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl"></div>
+                                
+                                <h3 class="text-3xl font-bold mb-10 relative z-10">Informasi Kontak</h3>
+                                <div class="space-y-8 relative z-10">
+                                    <div class="flex items-start group">
+                                        <div class="bg-white/10 p-4 rounded-2xl mr-5 group-hover:bg-white/20 transition-colors duration-300">
+                                            <i data-lucide="phone" class="text-blue-100" style="width: 24px; height: 24px;"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-blue-200 text-sm font-medium mb-1">WhatsApp / Telepon</p>
+                                            <p class="font-semibold text-xl tracking-wide">+62 89 876-543-210</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start group">
+                                        <div class="bg-white/10 p-4 rounded-2xl mr-5 group-hover:bg-white/20 transition-colors duration-300">
+                                            <i data-lucide="instagram" class="text-blue-100" style="width: 24px; height: 24px;"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-blue-200 text-sm font-medium mb-1">Instagram</p>
+                                            <p class="font-semibold text-lg tracking-wide">@permatalomboktransport</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start group">
+                                        <div class="bg-white/10 p-4 rounded-2xl mr-5 group-hover:bg-white/20 transition-colors duration-300">
+                                            <i data-lucide="mail" class="text-blue-100" style="width: 24px; height: 24px;"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-blue-200 text-sm font-medium mb-1">Email</p>
+                                            <p class="font-semibold text-lg">permatalomboktransport@gmail.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start group">
+                                        <div class="bg-white/10 p-4 rounded-2xl mr-5 group-hover:bg-white/20 transition-colors duration-300">
+                                            <i data-lucide="map-pin" class="text-blue-100" style="width: 24px; height: 24px;"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-blue-200 text-sm font-medium mb-1">Alamat Kantor</p>
+                                            <p class="font-semibold leading-relaxed">
+                                                Kekalik Jl. Swasembada No.133,<br/>
+                                                Karang Pule, Kec. Mataram,<br/>
+                                                Kota Mataram, NTB 83115.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Action Section -->
+                            <div class="p-10 md:p-14 flex flex-col justify-center bg-gray-50">
+                                <h3 class="text-3xl font-bold text-gray-900 mb-4">Pesan Sekarang</h3>
+                                <p class="text-gray-600 mb-10 text-lg leading-relaxed">
+                                    Pemesanan paling cepat dan mudah dilakukan melalui WhatsApp. Kami akan langsung merespon untuk mengonfirmasi jadwal Anda.
+                                </p>
+                                <a 
+                                    href="https://wa.me/6289876543210" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    class="w-full bg-[#25D366] hover:bg-[#1ebd59] text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-xl shadow-green-500/20 hover:shadow-green-500/40 hover:-translate-y-1 transform text-lg"
+                                >
+                                    <i data-lucide="phone" class="mr-3" style="width: 24px; height: 24px;"></i> Chat Via WhatsApp
+                                </a>
+                                <p class="text-sm text-center text-gray-500 mt-6 bg-gray-200/50 py-3 rounded-xl">
+                                    *Tersedia layanan konsultasi gratis 24/7
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-slate-900 text-slate-300 py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-4">Permata Lombok Transport</h3>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Mitra perjalanan tepercaya Anda untuk menjelajahi keindahan pulau Lombok dengan nyaman dan aman.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-4">Kontak Kami</h4>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-center"><i data-lucide="phone" class="mr-3 text-blue-400" style="width: 16px; height: 16px;"></i> +62 89 876-543-210</li>
+                            <li class="flex items-center"><i data-lucide="mail" class="mr-3 text-blue-400" style="width: 16px; height: 16px;"></i> permatalomboktransport@gmail.com</li>
+                            <li class="flex items-center"><i data-lucide="instagram" class="mr-3 text-blue-400" style="width: 16px; height: 16px;"></i> @permatalomboktransport</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-4">Alamat</h4>
+                        <div class="flex items-start">
+                            <i data-lucide="map-pin" class="mr-3 mt-1 text-blue-400 flex-shrink-0" style="width: 20px; height: 20px;"></i>
+                            <p class="text-sm leading-relaxed">
+                                Kekalik Jl. Swasembada No.133,<br/>
+                                Karang Pule, Kec. Mataram,<br/>
+                                Kota Mataram, Nusa Tenggara Barat,<br/>
+                                83115.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
+                    <p>Copyright © 2026 Permata Lombok Transport. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- SCRIPT LOGIKA SPA & ANIMASI -->
+    <script>
+        // Inisialisasi Icons
+        lucide.createIcons();
+
+        // 1. Logika Preloader
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const preloader = document.getElementById('preloader');
+                preloader.style.opacity = '0';
+                
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                    document.getElementById('app-wrapper').classList.remove('hidden');
+                    // Re-render icon agar muncul setelah wrapper ditampilkan
+                    lucide.createIcons();
+                }, 500); 
+            }, 2500); // 2.5 detik preloader
+        });
+
+        // 2. Logika Mobile Menu
+        let isMobileMenuOpen = false;
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const btn = document.getElementById('mobile-menu-btn');
+            
+            isMobileMenuOpen = !isMobileMenuOpen;
+            
+            if (isMobileMenuOpen) {
+                menu.classList.remove('hidden');
+                btn.innerHTML = '<i data-lucide="x" style="width: 28px; height: 28px;"></i>';
+            } else {
+                menu.classList.add('hidden');
+                btn.innerHTML = '<i data-lucide="menu" style="width: 28px; height: 28px;"></i>';
+            }
+            lucide.createIcons();
+        }
+
+        // 3. Logika Pergantian Halaman (SPA)
+        function setActivePage(pageId) {
+            // Sembunyikan semua halaman
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => {
+                page.style.display = 'none';
+                
+                // Trik me-restart animasi CSS dengan menghapus dan menambahkan kembali class
+                const animatedEls = page.querySelectorAll('.animate-fade-in-up');
+                animatedEls.forEach(el => {
+                    el.classList.remove('animate-fade-in-up');
+                    void el.offsetWidth; // Trigger reflow
+                    el.classList.add('animate-fade-in-up');
+                });
+            });
+
+            // Tampilkan halaman target
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) {
+                targetPage.style.display = 'block';
+            }
+
+            // Update status Navigasi Desktop
+            const desktopLinks = document.querySelectorAll('.desktop-nav-link');
+            desktopLinks.forEach(link => {
+                if (link.dataset.page === pageId) {
+                    link.className = "desktop-nav-link capitalize font-medium transition-colors text-blue-600 border-b-2 border-blue-600 pb-1";
+                } else {
+                    link.className = "desktop-nav-link capitalize font-medium transition-colors text-gray-600 hover:text-blue-500";
+                }
+            });
+
+            // Update status Navigasi Mobile
+            const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileLinks.forEach(link => {
+                if (link.dataset.page === pageId) {
+                    link.className = "mobile-nav-link block w-full text-left px-4 py-3 rounded-lg capitalize font-medium bg-blue-50 text-blue-600";
+                } else {
+                    link.className = "mobile-nav-link block w-full text-left px-4 py-3 rounded-lg capitalize font-medium text-gray-600 hover:bg-gray-50";
+                }
+            });
+
+            // Tutup menu mobile jika sedang terbuka
+            if (isMobileMenuOpen) {
+                toggleMobileMenu();
+            }
+
+            // Scroll ke atas
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
